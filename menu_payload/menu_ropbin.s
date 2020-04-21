@@ -182,7 +182,7 @@ HB_DSP_ADDR equ (HB_MEM0_ADDR - HB_DSP_SIZE)
 
 			wait_for_parameter_and_send MENU_LOADEDROP_BUFADR + fsUserString, MENU_FS_HANDLE
 			wait_for_parameter_and_send MENU_LOADEDROP_BUFADR + nssString, MENU_NSS_HANDLE
-			wait_for_parameter_and_send MENU_LOADEDROP_BUFADR + irrstString, MENU_IRRST_HANDLE
+			wait_for_parameter_and_send MENU_LOADEDROP_BUFADR + cfgsString, MENU_CFGS_HANDLE
 			wait_for_parameter_and_send MENU_LOADEDROP_BUFADR + amsysString, MENU_AMSYS_HANDLE
 			wait_for_parameter_and_send MENU_LOADEDROP_BUFADR + ptmsysmString, MENU_PTMSYSM_HANDLE
 			wait_for_parameter_and_send MENU_LOADEDROP_BUFADR + gsplcdString, MENU_GSPLCD_HANDLE
@@ -251,7 +251,7 @@ HB_DSP_ADDR equ (HB_MEM0_ADDR - HB_DSP_SIZE)
 	fsUserString:
 		.ascii "fs:USER"
 		.byte 0x00
-	irrstString:
+	cfgsString:
 		.ascii "cfg:s"
 		.byte 0x00
 		.byte 0x00
