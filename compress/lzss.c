@@ -12,6 +12,15 @@
 #define LZ11_MAX_LEN  65808
 #define LZ11_MAX_DISP 4096
 
+void* _memrchr(const void* segment, int c, size_t size)
+{
+  char* s = segment;
+  while (size--)
+    if (s[size] == c)
+      return s + size;
+  return NULL;
+}
+
 typedef enum
 {
   LZ10,
@@ -31,7 +40,7 @@ find_best_match(const uint8_t *start,
   if(start + max_disp < buffer)
     start = buffer - max_disp;
 
-  uint8_t *p = memrchr(start, *buffer, buffer - start);
+  uint8_t *p = _memrchr(start, *buffer, buffer - start);
   while(p != NULL)
   {
     size_t test_len = 1;
@@ -52,7 +61,7 @@ find_best_match(const uint8_t *start,
     if(best_len == len)
       break;
 
-    p = memrchr(start, *buffer, p - start);
+    p = _memrchr(start, *buffer, p - start);
   }
 
   if(best_len)
