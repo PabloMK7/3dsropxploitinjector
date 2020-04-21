@@ -500,7 +500,7 @@ size_t strlen(const char *str)
 void _main()
 {
 	Result ret;
-	Handle fsuHandle, nssHandle, irrstHandle, amsysHandle;
+	Handle fsuHandle, nssHandle, cfgsHandle, amsysHandle;
 	Handle ptmsysmHandle, gsplcdHandle, nwmextHandle, newssHandle, hbmem0Handle, hbndspHandle, hbkillHandle, bosspHandle;
 
 	initSrv();
@@ -523,7 +523,7 @@ void _main()
 
 	receive_handle(&fsuHandle, "fs:USER");
 	receive_handle(&nssHandle, "ns:s");
-	receive_handle(&irrstHandle, "cfg:s");
+	receive_handle(&cfgsHandle, "cfg:s");
 	receive_handle(&amsysHandle, "am:sys");
 	receive_handle(&ptmsysmHandle, "ptm:sysm");
 	receive_handle(&gsplcdHandle, "gsp::Lcd");
@@ -572,7 +572,7 @@ void _main()
 			{
 				{"fs:USER", fsuHandle},
 				{"ns:s", nssHandle},
-				{"cfg:s", irrstHandle},
+				{"cfg:s", cfgsHandle},
 				{"am:sys", amsysHandle},
 				{"ptm:sysm", ptmsysmHandle},
 				{"gsp::Lcd", gsplcdHandle},
