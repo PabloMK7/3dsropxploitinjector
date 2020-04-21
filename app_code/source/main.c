@@ -523,7 +523,7 @@ void _main()
 
 	receive_handle(&fsuHandle, "fs:USER");
 	receive_handle(&nssHandle, "ns:s");
-	receive_handle(&irrstHandle, "ir:rst");
+	receive_handle(&irrstHandle, "cfg:s");
 	receive_handle(&amsysHandle, "am:sys");
 	receive_handle(&ptmsysmHandle, "ptm:sysm");
 	receive_handle(&gsplcdHandle, "gsp::Lcd");
@@ -572,7 +572,7 @@ void _main()
 			{
 				{"fs:USER", fsuHandle},
 				{"ns:s", nssHandle},
-				{"ir:rst", irrstHandle},
+				{"cfg:s", irrstHandle},
 				{"am:sys", amsysHandle},
 				{"ptm:sysm", ptmsysmHandle},
 				{"gsp::Lcd", gsplcdHandle},

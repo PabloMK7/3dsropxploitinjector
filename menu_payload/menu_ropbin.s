@@ -252,7 +252,8 @@ HB_DSP_ADDR equ (HB_MEM0_ADDR - HB_DSP_SIZE)
 		.ascii "fs:USER"
 		.byte 0x00
 	irrstString:
-		.ascii "ir:rst"
+		.ascii "cfg:s"
+		.byte 0x00
 		.byte 0x00
 		.byte 0x00
 	amsysString:

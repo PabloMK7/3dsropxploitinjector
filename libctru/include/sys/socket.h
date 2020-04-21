@@ -109,7 +109,7 @@ extern "C" {
 	unsigned short htons(unsigned short num);
 	unsigned long htonl(unsigned long num);
 
-	extern int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds, struct timeval *timeout);
+	//extern int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds, struct timeval *timeout);
 
 #ifdef __cplusplus
 };
