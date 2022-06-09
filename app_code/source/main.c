@@ -106,7 +106,7 @@ void renderString(char* str, int x, int y)
 
 void centerString(char* str, int y)
 {
-	int x=200-(strlen(str)*4);
+	int x=200-(_strlen(str)*4);
 	drawString(top_framebuffer,str,x,y);
 	GSPGPU_FlushDataCache(NULL, top_framebuffer, 240*400*3);
 }
@@ -121,12 +121,13 @@ void drawHex(u32 val, int x, int y)
 
 void clearScreen(u8 shade)
 {
-	memset(top_framebuffer, shade, 240*400*3);
+	u64 val;
+	memset(&val, shade, 8);
 	//int i;
 	//u64 val = (shade << 8) | shade;
 	//val = (val << 16) | val;
 	//val = (val << 32) | val;
-	//for(i = 0; i < 240*400*3; i += 8) *(u64*)top_framebuffer = val;
+	for(int i = 0; i < 240*400*3; i += 8) *(u64*)top_framebuffer = val;
 	GSPGPU_FlushDataCache(NULL, top_framebuffer, 240*400*3);
 }
 
@@ -147,13 +148,13 @@ void resetConsole(void)
 
 void print_str(char* str)
 {
-	strcpy(&console_buffer[strlen(console_buffer)], str);
+	strcpy(&console_buffer[_strlen(console_buffer)], str);
 	drawTitleScreen(console_buffer);
 }
 
 void append_str(char* str)
 {
-	strcpy(&console_buffer[strlen(console_buffer)], str);
+	strcpy(&console_buffer[_strlen(console_buffer)], str);
 }
 
 void refresh_screen()
@@ -488,13 +489,11 @@ char *strcpy(char *dest, const char *src)
 	return dest;
 }
 
-size_t strlen(const char *str)
+int _strlen(const char* str)
 {
-	size_t len = 0;
-
-	while(*str++) len++;
-
-	return len;
+	int l=0;
+	while(*(str++) && l < 0x7fffffff)l++;
+	return l;
 }
 
 void _main()

@@ -39,13 +39,11 @@ int strcmp(const char *s1, const char *s2s)
 	return 0;
 }
 
-size_t strlen(const char *str)
+int _strlen(const char *str)
 {
-	size_t len = 0;
-
-	while(*str++) len++;
-
-	return len;
+	int l=0;
+	while(*(str++) && l < 0x7fffffff)l++;
+	return l;
 }
 
 void *memset(void *s, int c, size_t n)
@@ -389,8 +387,8 @@ Result _APT_CloseApplication(Handle* handle, u32 a, u32 b, u32 c)
 
 memorymap_t* getMmapArgbuf(u32* argbuffer, u32 argbuffer_length)
 {
-	u32 mmap_offset = (4 + strlen((char*)&argbuffer[1]) + 1);
-	int i; for(i=1; i<argbuffer[0]-1; i++) mmap_offset += strlen(&((char*)argbuffer)[mmap_offset]) + 1;
+	u32 mmap_offset = (4 + _strlen((char*)&argbuffer[1]) + 1);
+	int i; for(i=1; i<argbuffer[0]-1; i++) mmap_offset += _strlen(&((char*)argbuffer)[mmap_offset]) + 1;
 	mmap_offset = (mmap_offset + 0x3) & ~0x3;
 	return (memorymap_t*)((u32)argbuffer + mmap_offset);
 }
