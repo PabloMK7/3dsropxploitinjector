@@ -121,12 +121,12 @@ void drawHex(u32 val, int x, int y)
 
 void clearScreen(u8 shade)
 {
-	// memset(top_framebuffer, shade, 240*400*3);
-	int i;
-	u64 val = (shade << 8) | shade;
-	val = (val << 16) | val;
-	val = (val << 32) | val;
-	for(i = 0; i < 240*400*3; i += 8) *(u64*)top_framebuffer = val;
+	memset(top_framebuffer, shade, 240*400*3);
+	//int i;
+	//u64 val = (shade << 8) | shade;
+	//val = (val << 16) | val;
+	//val = (val << 32) | val;
+	//for(i = 0; i < 240*400*3; i += 8) *(u64*)top_framebuffer = val;
 	GSPGPU_FlushDataCache(NULL, top_framebuffer, 240*400*3);
 }
 

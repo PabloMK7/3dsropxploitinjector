@@ -1,5 +1,5 @@
-python scripts/buildVersion.py "11.13.0-45U" --enableotherapp
-python scripts/buildVersion.py "11.13.0-45E" --enableotherapp
-python scripts/buildVersion.py "11.13.0-45J" --enableotherapp
-python scripts/buildVersion.py "11.13.0-45K" --enableotherapp
+python scripts/buildVersion.py "11.15.0-47U" --enableotherapp
+rem python scripts/buildVersion.py "11.15.0-47E" --enableotherapp
+rem python scripts/buildVersion.py "11.15.0-47J" --enableotherapp
+rem python scripts/buildVersion.py "11.15.0-47K" --enableotherapp
 pause

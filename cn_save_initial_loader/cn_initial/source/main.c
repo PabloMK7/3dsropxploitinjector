@@ -11,9 +11,14 @@
 
 int _strlen(char* str)
 {
-	int l=0;
-	while(*(str++))l++;
-	return l;
+	//int l=0;
+	//while(*(str++))l++;
+	//return l;
+	
+	for(int i=0; i<0x7fffffff; i++){
+		if(*(str+i)==0) return i;
+	}
+	return -1;
 }
 
 void _strcpy(char* dst, char* src)
