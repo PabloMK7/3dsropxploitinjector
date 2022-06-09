@@ -93,12 +93,6 @@ menu_ropdb/ropdb.txt: menu_ropdb/$(MENUVERSION)_ropdb.txt
 build/constants: firm_constants/constants.txt cn_constants/constants.txt region_constants/constants.txt menu_ropdb/ropdb.txt
 	@python $(SCRIPTS)/makeHeaders.py $(FIRMVERSION) $(CNVERSION) $(MSETVERSION) $(ROVERSION) $(MENUVERSION) $(REGION) $(OUTNAME) build/constants $^
 
-menu_ropbin_patcher/menu_ropbin.exe:
-	@cd menu_ropbin_patcher && make
-
-compress/compress.exe:
-	@cd compress && make
-
 
 build/cn_qr_initial_loader.bin.png: cn_qr_initial_loader/cn_qr_initial_loader.bin.png
 	@cp cn_qr_initial_loader/cn_qr_initial_loader.bin.png build
@@ -173,5 +167,4 @@ clean:
 	@cd app_payload && make clean
 	@cd app_bootloader && make clean
 	@cd app_code && make clean
-	@cd menu_ropbin_patcher && make clean
 	@echo "all cleaned up !"
