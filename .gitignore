@@ -1,0 +1,40 @@
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+*.d
+
+# Precompiled Headers
+*.gch
+*.pch
+*bin.h
+
+# Libraries
+*.lib
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.out
+*.app
+*.bin
+
+# Debug files
+*.dSYM/
+*.su
+*.map
+
+# Build directories
+/build
+/output
+/release
+
+# Misc
+
