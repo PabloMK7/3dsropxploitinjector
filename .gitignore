@@ -30,6 +30,7 @@
 *.dSYM/
 *.su
 *.map
+debug
 
 # Build directories
 /build
@@ -39,4 +40,5 @@
 # Misc
 *.txt
 *app_code_reloc.s
+*.png
 
