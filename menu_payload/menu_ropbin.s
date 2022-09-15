@@ -141,20 +141,24 @@ USMHAXX equ 0x58584148
 		exitsuccess:
 		; Notify install success
 		writehwreg 0x202A04, 0x0100FF00
+		; Sleep a bit
+		sleep 2*1000*1000*1000, 0
 
 		jump_sp MENU_LOADEDROP_BUFADR + exit
 
 		exitfailure:
 		; Notify install failed
 		writehwreg 0x202A04, 0x010000FF
+		; Sleep a bit
+		sleep 2*1000*1000*1000, 0
 
 		; jump_sp MENU_LOADEDROP_BUFADR + exit
 	
 		exit:
-		; Sleep a bit
-		sleep 3*1000*1000*1000, 0
 		; Clear screen
 		writehwreg 0x202A04, 0x01000000
+		; Sleep a bit
+		sleep 1*1000*1000*1000, 0
 		; Release screen rights
 		gsp_release_right
 		; Shutdown system
