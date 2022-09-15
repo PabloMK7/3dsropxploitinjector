@@ -20,3 +20,4 @@ cn_save_initial_loader/*.bin
 cn_save_initial_loader/cn_initial/*.bin
 app_code_reloc.s
 debug
+.vscode
