@@ -9,27 +9,26 @@
 #include <ctr/GSP.h>
 #include "text.h"
 #ifndef LOADROPBIN
-#include "menu_payload_regionfree_bin.h"
+#include "menu_payload_regionfree.h"
 #else
-#include "menu_payload_loadropbin_bin.h"
+#include "menu_payload_loadropbin.h"
 #endif
 
 #ifndef OTHERAPP
 #ifndef QRINSTALLER
-#include "cn_save_initial_loader_bin.h"
+#include "cn_save_initial_loader.h"
 #endif
 #endif
 
 #ifdef LOADROPBIN
-#include "menu_ropbin_bin.h"
+#include "menu_ropbin.h"
 #endif
 
 #include "../../build/constants.h"
-#include "../../app_targets/app_targets.h"
 
 #include "decompress.h"
 
-#define HID_PAD (*(vu32*)0x1000001C)
+#define HID_PAD (*(vu32*)0x7000001C)
 
 typedef enum
 {
@@ -178,18 +177,6 @@ Result GSP_InvalidateDCache(u32* addr, u32 size)
 	return cmdbuf[1];
 }
 
-const u8 hexTable[]=
-{
-	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-};
-
-void hex2str(char* out, u32 val)
-{
-	int i;
-	for(i=0;i<8;i++){out[7-i]=hexTable[val&0xf];val>>=4;}
-	out[8]=0x00;
-}
-
 void renderString(char* str, int x, int y)
 {
 	u8 *ptr = GSP_GetTopFBADR();
@@ -203,13 +190,6 @@ void centerString(char* str, int y)
 	renderString(str, 200-(_strlen(str)*4), y);
 }
 
-void drawHex(u32 val, int x, int y)
-{
-	char str[9];
-
-	hex2str(str,val);
-	renderString(str,x,y);
-}
 
 Result _GSPGPU_ReleaseRight(Handle handle)
 {
@@ -222,16 +202,20 @@ Result _GSPGPU_ReleaseRight(Handle handle)
 	return cmdbuf[1];
 }
 
-const char* const aptServiceNames[] = {"APT:U", "APT:A", "APT:S"};
-
 #define _aptSessionInit() \
 	int aptIndex; \
-	for(aptIndex = 0; aptIndex < 3; aptIndex++)	if(!_srv_getServiceHandle(srvHandle, &aptuHandle, (char*)aptServiceNames[aptIndex]))break;\
+	const char* aptSessionName; \
+	for(aptIndex = 0; aptIndex < 3; aptIndex++)	{ \
+	if (aptIndex == 0) aptSessionName = "APT:U"; \
+	if (aptIndex == 1) aptSessionName = "APT:A"; \
+	if (aptIndex == 2) aptSessionName = "APT:S"; \
+	if(!_srv_getServiceHandle(srvHandle, &aptuHandle, (char*)aptSessionName)) break; \
+	} \
 	svc_closeHandle(aptuHandle);\
 
 #define _aptOpenSession() \
 	svc_waitSynchronization1(aptLockHandle, U64_MAX);\
-	_srv_getServiceHandle(srvHandle, &aptuHandle, (char*)aptServiceNames[aptIndex]);\
+	_srv_getServiceHandle(srvHandle, &aptuHandle, (char*)aptSessionName);\
 
 #define _aptCloseSession()\
 	svc_closeHandle(aptuHandle);\
@@ -271,26 +255,12 @@ void clearScreen(u8 shade)
 	GSP_FlushDCache((u32*)ptr, 240*400*3);
 }
 
-void errorScreen(char* str, u32* dv, u8 n)
-{
-	clearScreen(0x00);
-	renderString("FATAL ERROR",0,0);
-	renderString(str,0,10);
-	if(dv && n)
-	{
-		int i;
-		for(i=0;i<n;i++)drawHex(dv[i], 8, 50+i*10);
-	}
-	while(1);
-}
-
 void drawTitleScreen(char* str)
 {
 	clearScreen(0x00);
 	centerString(HAX_NAME_VERSION,0);
 	centerString(BUILDTIME,10);
-	centerString("smealum.github.io/ninjhax2/",20);
-	renderString(str, 0, 40);
+	renderString(str, 0, 20);
 }
 
 // Result _APT_HardwareResetAsync(Handle* handle)
@@ -303,153 +273,6 @@ void drawTitleScreen(char* str)
 	
 // 	return cmdbuf[1];
 // }
-
-#ifndef OTHERAPP
-#ifndef QRINSTALLER
-//no idea what this does; apparently used to switch up save partitions
-Result FSUSER_ControlArchive(Handle handle, FS_archive archive)
-{
-	u32* cmdbuf=getThreadCommandBuffer();
-
-	u32 b1 = 0, b2 = 0;
-
-	cmdbuf[0]=0x080d0144;
-	cmdbuf[1]=archive.handleLow;
-	cmdbuf[2]=archive.handleHigh;
-	cmdbuf[3]=0x0;
-	cmdbuf[4]=0x1; //buffer1 size
-	cmdbuf[5]=0x1; //buffer1 size
-	cmdbuf[6]=0x1a;
-	cmdbuf[7]=(u32)&b1;
-	cmdbuf[8]=0x1c;
-	cmdbuf[9]=(u32)&b2;
- 
-	Result ret=0;
-	if((ret=svc_sendSyncRequest(handle)))return ret;
- 
-	return cmdbuf[1];
-}
-
-Result FSUSER_FormatThisUserSaveData(Handle handle, u32 sizeblock, u32 countDirectoryEntry, u32 countFileEntry, u32 countDirectoryEntryBucket, u32 countFileEntryBucket, bool isDuplicateAll)
-{
-	u32* cmdbuf=getThreadCommandBuffer();
-
-	cmdbuf[0]=0x080F0180;
-	cmdbuf[1]=sizeblock;
-	cmdbuf[2]=countDirectoryEntry;
-	cmdbuf[3]=countFileEntry;
-	cmdbuf[4]=countDirectoryEntryBucket;
-	cmdbuf[5]=countFileEntryBucket;
-	cmdbuf[6]=isDuplicateAll;
- 
-	Result ret=0;
-	if((ret=svc_sendSyncRequest(handle)))return ret;
- 
-	return cmdbuf[1];
-}
-
-Result FSUSER_CreateDirectory(Handle handle, FS_archive archive, FS_path dirLowPath)
-{
-	u32 *cmdbuf = getThreadCommandBuffer();
-
-	cmdbuf[0] = 0x08090182;
-	cmdbuf[1] = 0;
-	cmdbuf[2] = archive.handleLow;
-	cmdbuf[3] = archive.handleHigh;
-	cmdbuf[4] = dirLowPath.type;
-	cmdbuf[5] = dirLowPath.size;
-	cmdbuf[6] = 0;
-	cmdbuf[7] = (dirLowPath.size << 14) | 0x2;
-	cmdbuf[8] = (u32)dirLowPath.data;
-
-	Result ret = 0;
-	if((ret = svc_sendSyncRequest(handle)))return ret;
-
-	return cmdbuf[1];
-}
-
-void installerScreen(u32 size)
-{
-	char str[512] =
-		"install the exploit to your savegame ?\n"
-		"this will delete your savegame and make some\n"
-		"of the game temporarily inoperable.\n"
-		"the exploit can later be uninstalled.\n"
-		"    A : Yes \n"
-		"    B : No  ";
-	drawTitleScreen(str);
-
-	while(1)
-	{
-		u32 PAD = HID_PAD;
-		if(PAD & PAD_A)
-		{
-			// install
-			int state=0;
-			Result ret;
-			Handle fsuHandle=*(Handle*)CN_FSHANDLE_ADR;
-			FS_archive saveArchive=(FS_archive){0x00000004, (FS_path){PATH_EMPTY, 1, (u8*)""}};
-			u32 totalWritten1 = 0x0deaddad;
-			u32 totalWritten2 = 0x1deaddad;
-			Handle fileHandle;
-
-			_strappend(str, "\n\n   installing..."); drawTitleScreen(str);
-
-			// format the shit out of the archive
-			ret=FSUSER_FormatThisUserSaveData(fsuHandle, 0x200, 0x20, 0x40, 0x25, 0x43, true);
-			state++; if(ret)goto installEnd;
-
-			ret=FSUSER_OpenArchive(fsuHandle, &saveArchive);
-			state++; if(ret)goto installEnd;
-
-			ret=FSUSER_CreateDirectory(fsuHandle, saveArchive, FS_makePath(PATH_CHAR, "/edit/"));
-			state++; if(ret)goto installEnd;
-
-			// write exploit map file
-			ret=FSUSER_OpenFile(fsuHandle, &fileHandle, saveArchive, FS_makePath(PATH_CHAR, "/edit/mslot0.map"), FS_OPEN_WRITE|FS_OPEN_CREATE, FS_ATTRIBUTE_NONE);
-			state++; if(ret)goto installEnd;
-			ret=FSFILE_Write(fileHandle, &totalWritten1, 0x0, (u32*)cn_save_initial_loader_bin, cn_save_initial_loader_bin_size, 0x10001);
-			state++; if(ret)goto installEnd;
-			ret=FSFILE_Close(fileHandle);
-			state++; if(ret)goto installEnd;
-
-			// write secondary payload file
-			ret=FSUSER_OpenFile(fsuHandle, &fileHandle, saveArchive, FS_makePath(PATH_CHAR, "/edit/payload.bin"), FS_OPEN_WRITE|FS_OPEN_CREATE, FS_ATTRIBUTE_NONE);
-			state++; if(ret)goto installEnd;
-			ret=FSFILE_Write(fileHandle, &totalWritten2, 0x0, (u32*)0x14300000, size, 0x10001);
-			state++; if(ret)goto installEnd;
-			ret=FSFILE_Close(fileHandle);
-			state++; if(ret)goto installEnd;
-
-			ret=FSUSER_ControlArchive(fsuHandle, saveArchive);
-			state++; if(ret)goto installEnd;
-
-			ret=FSUSER_CloseArchive(fsuHandle, &saveArchive);
-			state++; if(ret)goto installEnd;
-
-			installEnd:
-			if(ret)
-			{
-				u32 v[5]={ret, state, totalWritten1, totalWritten2, size};
-				errorScreen("   installation process failed.\n   please report the below information by\n   email to sme@lum.sexy", v, 5);
-			}
-
-			_strappend(str, " done.\n\n   press A to run the exploit."); drawTitleScreen(str);
-			u32 oldPAD=((u32*)0x10000000)[7];
-			while(1)
-			{
-				u32 PAD=((u32*)0x10000000)[7];
-				if(((PAD^oldPAD)&PAD_A) && (PAD&PAD_A))break;
-				drawHex(PAD,200,200);
-				oldPAD=PAD;
-			}
-
-			break;
-		}else if(PAD&PAD_B)break;
-	}
-}
-#endif
-#endif
 
 #ifdef RECOVERY
 void doRecovery()
@@ -675,11 +498,11 @@ void inject_payload(u32* linear_buffer, u32 target_address, u32* ropbin_linear_b
 		u32 payload_size;
 
 		#ifndef LOADROPBIN
-			payload_src = (u32*)menu_payload_regionfree_bin;
-			payload_size = menu_payload_regionfree_bin_size;
+			payload_src = (u32*)data_menu_payload_regionfree_bin;
+			payload_size = data_menu_payload_regionfree_bin_length;
 		#else
-			payload_src = (u32*)menu_payload_loadropbin_bin;
-			payload_size = menu_payload_loadropbin_bin_size;
+			payload_src = (u32*)data_menu_payload_loadropbin_bin;
+			payload_size = data_menu_payload_loadropbin_bin_length;
 		#endif
 
 		u32* payload_dst = &(linear_buffer)[target_offset/4];
@@ -773,18 +596,15 @@ int main(u32 loaderparam, char** argv)
 
 		s64 tmp = 0;
 		ret = svc_getSystemInfo(&tmp, 0, 1);
-		drawHex(*(u32*)0x1FF80040 - (u32)tmp, 8, 40);
 
 		MemInfo minfo;
 		PageInfo pinfo;
 		ret = svc_queryMemory(&minfo, &pinfo, 0x08000000);
-		drawHex(minfo.size, 8, 50);
 
 		#define UDS_ERROR_INDICATOR 0x00011000
 
 		ret = udsploit(linear_buffer);
 		ret ^= UDS_ERROR_INDICATOR;
-		drawHex(ret, 8, 60);
 
 		if(ret ^ UDS_ERROR_INDICATOR)
 		{
@@ -804,20 +624,19 @@ int main(u32 loaderparam, char** argv)
 	const u32 end_addr = FIRM_LINEARSYSTEM + 0x01000000;
 	const u32 block_size = 0x00010000;
 	const u32 block_stride = block_size-0x100; // keep some overlap to make sure we don't miss anything
-
+	
 	int targetProcessIndex = 1;
 
 	#ifdef LOADROPBIN
-		u32 *ptr32 = (u32*)menu_ropbin_bin;
+		u32 *ptr32 = (u32*)data_menu_ropbin_bin;
 		u32* ropbin_linear_buffer = &((u8*)linear_buffer)[block_size];
 		u32* ropbin_bkp_linear_buffer = &((u8*)ropbin_linear_buffer)[MENU_LOADEDROP_BKP_BUFADR - MENU_LOADEDROP_BUFADR];
 
-		// Decompress menu_ropbin_bin into homemenu linearmem.
-		lz11Decompress(&menu_ropbin_bin[4], (u8*)ropbin_linear_buffer, ptr32[0] >> 8);
+		// Decompress data_menu_ropbin_bin into homemenu linearmem.
+		lz11Decompress(&data_menu_ropbin_bin[4], (u8*)ropbin_linear_buffer, ptr32[0] >> 8);
 
 		// copy un-processed ropbin to backup location
 		memcpy(ropbin_bkp_linear_buffer, ropbin_linear_buffer, MENU_LOADEDROP_BKP_BUFADR - MENU_LOADEDROP_BUFADR);
-		patchPayload(ropbin_linear_buffer, targetProcessIndex, NULL);
 
 		GSP_FlushDCache(ropbin_linear_buffer, (MENU_LOADEDROP_BKP_BUFADR - MENU_LOADEDROP_BUFADR) * 2);
 
@@ -856,10 +675,6 @@ int main(u32 loaderparam, char** argv)
 
 			target_address = block_start + i * 4;
 
-			// drawHex(target_address, 8, 50+cnt*10);
-			// drawHex((linear_buffer)[i+6], 100, 50+cnt*10);
-			// drawHex((linear_buffer)[i+0x1f], 200, 50+cnt*10);
-
 			#ifdef LOADROPBIN
 				inject_payload(linear_buffer, target_address + 0x18, ropbin_linear_buffer, (MENU_LOADEDROP_BKP_BUFADR - MENU_LOADEDROP_BUFADR) * 2);
 			#else
@@ -868,6 +683,7 @@ int main(u32 loaderparam, char** argv)
 
 			block_start = target_address + 0x10 - block_stride;
 			cnt++;
+
 			break;
 		}
 	}
@@ -879,7 +695,7 @@ int main(u32 loaderparam, char** argv)
 		#ifndef LOADROPBIN
 			drawTitleScreen("\n   regionFOUR is ready.\n   insert your gamecard and press START.");
 		#else
-			drawTitleScreen("\n   The homemenu ropbin is ready.");
+			drawTitleScreen("Select exploit:\n\n   X: unSAFE_MODE\n   Y: menuhax67\n   START: Exit\n\n(Green Screen = SUCCESS)\n(Red Screen = FAILURE)");
 		#endif
 	}else{
 		drawTitleScreen("\n   failed to locate takeover object :(");

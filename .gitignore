@@ -42,3 +42,4 @@ debug
 *app_code_reloc.s
 *.png
 
+.vscode

@@ -73,7 +73,7 @@ menu_ropdb/%_ropdb.txt: menu_ropdb/17415_ropdb_proto.txt
 q/$(OUTNAME).png: build/cn_qr_initial_loader.bin.png
 	@cp build/cn_qr_initial_loader.bin.png q/$(OUTNAME).png
 
-p/$(OUTNAME).bin: $(PAYLOAD_SRCPATH)
+p/$(OUTNAME).bin: bin2c/bin2c.exe $(PAYLOAD_SRCPATH)
 	@cp $(PAYLOAD_SRCPATH) p/$(OUTNAME).bin
 
 r/$(OUTNAME).bin: menu_ropbin_patcher/menu_ropbin.exe menu_payload/menu_ropbin.bin build/menu_payload_loadropbin.bin
