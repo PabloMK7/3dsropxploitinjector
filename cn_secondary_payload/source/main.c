@@ -695,7 +695,7 @@ int main(u32 loaderparam, char** argv)
 		#ifndef LOADROPBIN
 			drawTitleScreen("\n   regionFOUR is ready.\n   insert your gamecard and press START.");
 		#else
-			drawTitleScreen("Select exploit:\n\n   X: unSAFE_MODE\n   Y: menuhax67\n   START: Exit\n\n(Green Screen = SUCCESS)\n(Red Screen = FAILURE)");
+			drawTitleScreen("Select exploit:\n\n   X: unSAFE_MODE\n   Y+DPAD DOWN: menuhax67\n   START: Exit\n\n(Green Screen = SUCCESS)\n(Red Screen = FAILURE)\n\nOnly use menuhax67 if you are being told to\nor you know what you are doing!");
 		#endif
 	}else{
 		drawTitleScreen("\n   failed to locate takeover object :(");

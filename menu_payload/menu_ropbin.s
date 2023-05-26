@@ -73,7 +73,7 @@ USMHAXX equ 0x58584148
 		cond_jump_sp MENU_LOADEDROP_BUFADR + checkinputloop2, MENU_PAD, (1<<10)
 		jump_sp MENU_LOADEDROP_BUFADR + unsafemodeinstaller
 		checkinputloop2:
-		cond_jump_sp MENU_LOADEDROP_BUFADR + checkinputloop3, MENU_PAD, (1<<11)
+		cond_jump_sp MENU_LOADEDROP_BUFADR + checkinputloop3, MENU_PAD, ((1<<11) | (1<<7))
 		jump_sp MENU_LOADEDROP_BUFADR + menuhax67installer
 		checkinputloop3:
 		cond_jump_sp MENU_LOADEDROP_BUFADR + checkinputloop, MENU_PAD, (1<<3)
