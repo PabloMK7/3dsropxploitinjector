@@ -189,7 +189,7 @@ USMHAXX equ 0x58584148
 			.word 0x00347a10 + 0xA8
 		.endif
 		.if REGION == "U"
-			.word 0x00346a10 + 0xA8
+			.word 0x00347a10 + 0xA8
 		.endif
 		.if REGION == "J"
 			.word 0x00347a10 + 0xA8
